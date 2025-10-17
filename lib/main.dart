@@ -6,7 +6,8 @@ import 'features/company/company_selector_page.dart';
 import 'features/auth/login_page.dart';
 import 'features/admin/admin_login_page.dart';
 import 'features/company/company_setup_page.dart';
-import 'features/admin/admin_dashboard_page.dart'; // ⬅ AdminDashboard real (Dart)
+import 'features/admin/admin_dashboard_page.dart';
+import 'features/attendance/employee_attendance_page.dart'; // ⬅️ NUEVO: asistencia empleado
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -25,7 +26,7 @@ class AssistFlowApp extends StatelessWidget {
       theme: appTheme,
       navigatorKey: navigatorKey,
       home: CompanySelectorPage(
-        // Flujo empleado → Login → Dashboard (placeholder)
+        // Flujo empleado → Login → EmployeeAttendance
         onCompanySelected: (companyId, companyName) {
           navigatorKey.currentState!.push(
             MaterialPageRoute(
@@ -34,8 +35,23 @@ class AssistFlowApp extends StatelessWidget {
                 companyName: companyName,
                 onBack: () => navigatorKey.currentState!.pop(),
                 onLogin: (userData) {
+                  // userData proviene del LoginPage (mock o backend)
+                  final employee = Employee.fromMap(userData);
                   navigatorKey.currentState!.pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (_) => const DashboardPage()),
+                    MaterialPageRoute(
+                      builder: (_) => EmployeeAttendancePage(
+                        employee: employee,
+                        companyId: companyId,
+                        companyName: companyName,
+                        onLogout: () {
+                          // Al cerrar sesión del empleado, vuelve al selector limpio
+                          navigatorKey.currentState!.pushAndRemoveUntil(
+                            MaterialPageRoute(builder: (_) => AssistFlowRoot()),
+                                (route) => false,
+                          );
+                        },
+                      ),
+                    ),
                         (route) => false,
                   );
                 },
@@ -62,9 +78,7 @@ class AssistFlowApp extends StatelessWidget {
                                 onLogout: () {
                                   // Al salir del admin dashboard, vuelve al selector
                                   navigatorKey.currentState!.pushAndRemoveUntil(
-                                    MaterialPageRoute(
-                                      builder: (_) => AssistFlowRoot(), // vuelve a raíz (selector)
-                                    ),
+                                    MaterialPageRoute(builder: (_) => AssistFlowRoot()),
                                         (route) => false,
                                   );
                                 },
@@ -88,8 +102,8 @@ class AssistFlowApp extends StatelessWidget {
   }
 }
 
-/// Un wrapper simple para reconstruir el "home" (selector) al desloguear admin.
-/// Puedes reemplazar esto por estado global si prefieres.
+/// Wrapper simple para reconstruir el selector al desloguear.
+/// (Puedes reemplazarlo por estado global más adelante).
 class AssistFlowRoot extends StatelessWidget {
   AssistFlowRoot({super.key});
 
@@ -108,8 +122,21 @@ class AssistFlowRoot extends StatelessWidget {
                 companyName: companyName,
                 onBack: () => navigatorKey.currentState!.pop(),
                 onLogin: (userData) {
+                  final employee = Employee.fromMap(userData);
                   navigatorKey.currentState!.pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (_) => const DashboardPage()),
+                    MaterialPageRoute(
+                      builder: (_) => EmployeeAttendancePage(
+                        employee: employee,
+                        companyId: companyId,
+                        companyName: companyName,
+                        onLogout: () {
+                          navigatorKey.currentState!.pushAndRemoveUntil(
+                            MaterialPageRoute(builder: (_) => AssistFlowRoot()),
+                                (route) => false,
+                          );
+                        },
+                      ),
+                    ),
                         (route) => false,
                   );
                 },
@@ -154,19 +181,3 @@ class AssistFlowRoot extends StatelessWidget {
     );
   }
 }
-
-/// ----------------------
-/// Pantallas temporales (empleado)
-/// ----------------------
-class DashboardPage extends StatelessWidget {
-  const DashboardPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Dashboard')),
-      body: const Center(child: Text('Bienvenido 👋')),
-    );
-  }
-}
-
