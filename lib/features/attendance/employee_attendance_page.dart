@@ -179,52 +179,90 @@ class _EmployeeAttendancePageState extends State<EmployeeAttendancePage> {
                 children: [
                   // Header
                   // Header (reemplaza todo tu Row actual por este)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'AsistControl',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.w800,
-                              fontSize: 22,
-                            ),
+                  // Header (reemplaza tu Row actual completo por este widget)
+                  // Header centrado con botones debajo y responsivos
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Título centrado
+                        Text(
+                          'AsistControl',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 22,
                           ),
-                          Text(widget.companyName, style: const TextStyle(color: Colors.grey)),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          // 👇 NUEVO: Botón Tablero de Asistencia
-                          FilledButton.icon(
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) => EmployeePersonalDashboardPage(
-                                    employee: widget.employee,
-                                    companyId: widget.companyId,
-                                    companyName: widget.companyName,
-                                    onLogout: widget.onLogout,
-                                    onAttendance: () => Navigator.of(context).pop(), // volver a esta pantalla
-                                  ),
+                        ),
+                        const SizedBox(height: 2),
+                        // Subtítulo (empresa) centrado
+                        Text(
+                          widget.companyName,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                        const SizedBox(height: 10),
+
+                        // Botones debajo del título, responsivos (Wrap)
+                        Center(
+                          child: Wrap(
+                            alignment: WrapAlignment.center,     // centra horizontalmente
+                            spacing: 8,                           // separación horizontal entre botones
+                            runSpacing: 8,                        // separación vertical cuando “salte” a otra fila
+                            children: [
+                              // Botón Tablero de Asistencia
+                              FilledButton.icon(
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => EmployeePersonalDashboardPage(
+                                        employee: widget.employee,
+                                        companyId: widget.companyId,
+                                        companyName: widget.companyName,
+                                        onLogout: widget.onLogout,
+                                        onAttendance: () => Navigator.of(context).pop(),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.analytics_outlined, size: 18),
+                                label: const Text('Tablero de Asistencia'),
+                                style: FilledButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                  minimumSize: const Size(0, 36),
+                                  visualDensity: VisualDensity.compact,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                 ),
-                              );
-                            },
-                            icon: const Icon(Icons.analytics_outlined, size: 18),
-                            label: const Text('Tablero de Asistencia'),
+                              ),
+
+                              // Botón Cerrar sesión
+                              OutlinedButton(
+                                onPressed: widget.onLogout,
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                  minimumSize: const Size(0, 36),
+                                  visualDensity: VisualDensity.compact,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
+                                child: const Text('Cerrar Sesión'),
+                              ),
+
+                              // (Opcional) Botón extra — ejemplo
+                              // OutlinedButton.icon(
+                              //   onPressed: () {},
+                              //   icon: const Icon(Icons.history, size: 18),
+                              //   label: const Text('Historial'),
+                              // ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          OutlinedButton(
-                            onPressed: widget.onLogout,
-                            child: const Text('Cerrar Sesión'),
-                          ),
-                        ],
-                      ),
-                    ],
+                        ),
+                      ],
+                    ),
                   ),
+
+
                   const SizedBox(height: 12),
 
                   // Bienvenida
